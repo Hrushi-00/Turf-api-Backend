@@ -1,4 +1,5 @@
 const turfService = require('./turf.service');
+const sendError = (res, error, fallback = 500) => res.status(error.statusCode || fallback).json({ success: false, message: error.message });
 
 const addTurf = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ const addTurf = async (req, res) => {
     });
     res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    sendError(res, error, 400);
   }
 };
 
@@ -19,7 +20,7 @@ const getAllTurfs = async (req, res) => {
     const result = await turfService.getAllTurfs(req.query);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -28,7 +29,7 @@ const getAdminTurfs = async (req, res) => {
     const result = await turfService.getAdminTurfs(req.user);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -37,7 +38,7 @@ const getTurf = async (req, res) => {
     const result = await turfService.getTurf({ id: req.params.id }, req.user);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -50,7 +51,7 @@ const updateTurf = async (req, res) => {
     );
     res.status(200).json(result);
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    sendError(res, error, 400);
   }
 };
 
@@ -62,7 +63,7 @@ const updateTurfMetaInfo = async (req, res) => {
     );
     res.status(200).json(result);
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    sendError(res, error, 400);
   }
 };
 
@@ -71,7 +72,7 @@ const deleteTurf = async (req, res) => {
     const result = await turfService.deleteTurf({ id: req.params.id }, req.user);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -80,7 +81,7 @@ const getBookingStats = async (req, res) => {
     const result = await turfService.getBookingStats(req.user);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -89,7 +90,7 @@ const approveTurf = async (req, res) => {
     const result = await turfService.approveTurf(req.params.id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -98,7 +99,7 @@ const rejectTurf = async (req, res) => {
     const result = await turfService.rejectTurf(req.params.id);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -107,7 +108,7 @@ const getFeaturedTurfs = async (req, res) => {
     const result = await turfService.getFeaturedTurfs();
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -116,7 +117,7 @@ const getTrendingTurfs = async (req, res) => {
     const result = await turfService.getTrendingTurfs();
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -125,7 +126,7 @@ const getApprovedTurfs = async (req, res) => {
     const result = await turfService.getApprovedTurfs();
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -137,7 +138,7 @@ const getTurfAvailability = async (req, res) => {
     }, req.user);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendError(res, error);
   }
 };
 

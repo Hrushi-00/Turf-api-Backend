@@ -7,6 +7,8 @@ const { validateUserSignup, validateUserLogin, validateUpdateProfile, validateCh
 
 router.post('/signup', validateUserSignup, validate, userController.signup);
 router.post('/login', validateUserLogin, validate, userController.login);
+router.post('/refresh-token', userController.refresh);
+router.post('/logout', protectUser, userController.logout);
 router.get('/profile', protectUser, userController.getProfile);
 router.put('/profile', protectUser, validateUpdateProfile, validate, userController.updateProfile);
 router.patch('/password', protectUser, validateChangePassword, validate, userController.changePassword);

@@ -1,4 +1,5 @@
 const businessService = require('./business.service');
+const { sendHttpError } = require('../../utils/http-error-response');
 
 const signup = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const signup = async (req, res) => {
     const result = await businessService.signup({ username, email, password });
     res.status(201).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Signup failed', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -32,7 +33,7 @@ const login = async (req, res) => {
     const result = await businessService.login({ email, password });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Login failed', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -42,7 +43,7 @@ const getProfile = async (req, res) => {
     const result = await businessService.getProfile(businessUserId);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error fetching profile', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -53,7 +54,7 @@ const updateProfile = async (req, res) => {
     const result = await businessService.updateProfile(businessUserId, { username, email });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -72,7 +73,7 @@ const changePassword = async (req, res) => {
     const result = await businessService.changePassword(businessUserId, { currentPassword, newPassword });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 

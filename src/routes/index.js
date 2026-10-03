@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 const authRoutes = require('../modules/auth/auth.routes');
 const authBusinessRoutes = require('../modules/auth/business.routes');
@@ -8,9 +9,26 @@ const adminRoutes = require('../modules/turf/admin.routes');
 const userRoutes = require('../modules/user/user.routes');
 const businessRoutes = require('../modules/business/business.routes');
 const bookingRoutes = require('../modules/booking/booking.routes');
+const locationRoutes = require('../modules/locations/location.routes');
+const venueRoutes = require('../modules/venues/venue.routes');
+const businessVenueRoutes = require('../modules/venues/venue.business.routes');
+const sportRoutes = require('../modules/sports/sport.routes');
+const paymentRoutes = require('../modules/payments/payment.routes');
+const subscriptionRoutes = require('../modules/subscriptions/subscription.routes');
+const financialRoutes = require('../modules/financials/financial.routes');
+const invoiceRoutes = require('../modules/invoices/invoice.routes');
+const notificationRoutes = require('../modules/notifications/notification.routes');
+const supportRoutes = require('../modules/support/support.routes');
+const reviewRoutes = require('../modules/reviews/review.routes');
+const analyticsRoutes = require('../modules/analytics/analytics.routes');
+const auditRoutes = require('../modules/audit/audit.routes');
+const walletRoutes = require('../modules/wallet/wallet.routes');
+const membershipRoutes = require('../modules/memberships/membership.routes');
+const loyaltyRoutes = require('../modules/loyalty/loyalty.routes');
 
 router.get('/health', (req, res) => {
-  res.status(200).json({ success: true, message: 'API is running' });
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({ success: ready, status: ready ? 'ready' : 'not_ready' });
 });
 
 router.use('/auth', authRoutes);
@@ -21,6 +39,22 @@ router.use('/admin', adminRoutes);
 router.use('/users', userRoutes);
 router.use('/user/auth', userRoutes);
 router.use('/business', businessRoutes);
+router.use('/business/locations', locationRoutes);
+router.use('/business/venues', businessVenueRoutes);
+router.use('/venues', venueRoutes);
+router.use('/sports', sportRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/subscriptions', subscriptionRoutes);
+router.use('/financials', financialRoutes);
+router.use('/invoices', invoiceRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/support', supportRoutes);
+router.use('/reviews', reviewRoutes);
+router.use('/analytics', analyticsRoutes);
+router.use('/admin/audit-logs', auditRoutes);
+router.use('/wallet', walletRoutes);
+router.use('/memberships', membershipRoutes);
+router.use('/loyalty', loyaltyRoutes);
 router.use('/user/bookings', bookingRoutes);
 router.use('/bookings', bookingRoutes);
 

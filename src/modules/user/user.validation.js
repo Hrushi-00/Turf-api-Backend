@@ -21,8 +21,12 @@ const validateUserSignup = [
     .matches(/^[0-9]+$/).withMessage('Contact number can only contain digits'),
   body('address')
     .optional()
-    .trim()
-    .isLength({ max: 200 }).withMessage('Address must not exceed 200 characters'),
+    .isObject().withMessage('Address must be an object'),
+  body('address.street').optional().trim().isLength({ max: 200 }).withMessage('Street must not exceed 200 characters'),
+  body('address.city').optional().trim().isLength({ max: 100 }).withMessage('City must not exceed 100 characters'),
+  body('address.state').optional().trim().isLength({ max: 100 }).withMessage('State must not exceed 100 characters'),
+  body('address.zipCode').optional().trim().isLength({ max: 20 }).withMessage('Zip code must not exceed 20 characters'),
+  body('address.country').optional().trim().isLength({ max: 100 }).withMessage('Country must not exceed 100 characters'),
   body('profileImage')
     .optional()
     .trim()
@@ -56,12 +60,17 @@ const validateUpdateProfile = [
     .matches(/^[0-9]+$/).withMessage('Contact number can only contain digits'),
   body('address')
     .optional()
-    .trim()
-    .isLength({ max: 200 }).withMessage('Address must not exceed 200 characters'),
+    .isObject().withMessage('Address must be an object'),
+  body('address.street').optional().trim().isLength({ max: 200 }).withMessage('Street must not exceed 200 characters'),
+  body('address.city').optional().trim().isLength({ max: 100 }).withMessage('City must not exceed 100 characters'),
+  body('address.state').optional().trim().isLength({ max: 100 }).withMessage('State must not exceed 100 characters'),
+  body('address.zipCode').optional().trim().isLength({ max: 20 }).withMessage('Zip code must not exceed 20 characters'),
+  body('address.country').optional().trim().isLength({ max: 100 }).withMessage('Country must not exceed 100 characters'),
   body('profileImage')
     .optional()
     .trim()
-    .isURL().withMessage('Profile image must be a valid URL')
+    .isURL().withMessage('Profile image must be a valid URL'),
+  body().custom((value) => Object.keys(value || {}).length > 0).withMessage('At least one profile field is required')
 ];
 
 const validateChangePassword = [

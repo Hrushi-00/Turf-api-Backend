@@ -1,6 +1,19 @@
 const authService = require('./auth.service');
+const crypto = require('crypto');
+const { sendHttpError } = require('../../utils/http-error-response');
+
+const canRegisterAdmin = (providedKey) => {
+  const expectedKey = process.env.ADMIN_REGISTRATION_KEY;
+  if (!expectedKey || typeof providedKey !== 'string') return false;
+  const expected = Buffer.from(expectedKey);
+  const provided = Buffer.from(providedKey);
+  return expected.length === provided.length && crypto.timingSafeEqual(expected, provided);
+};
 
 const register = async (req, res) => {
+  if (!canRegisterAdmin(req.get('x-admin-registration-key'))) {
+    return res.status(403).json({ success: false, message: 'Admin registration is disabled or unauthorized' });
+  }
   try {
     const { username, email, password } = req.body;
 
@@ -14,7 +27,7 @@ const register = async (req, res) => {
     const result = await authService.register({ username, email, password });
     res.status(201).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -32,7 +45,7 @@ const login = async (req, res) => {
     const result = await authService.login({ email, password });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -42,7 +55,7 @@ const getProfile = async (req, res) => {
     const result = await authService.getProfile(adminId);
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -53,7 +66,7 @@ const updateProfile = async (req, res) => {
     const result = await authService.updateProfile(adminId, { username, email });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 
@@ -72,7 +85,7 @@ const changePassword = async (req, res) => {
     const result = await authService.changePassword(adminId, { currentPassword, newPassword });
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    sendHttpError(res, error);
   }
 };
 

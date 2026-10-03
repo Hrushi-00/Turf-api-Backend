@@ -1,16 +1,22 @@
-const { body, param } = require('express-validator');
+const { body, param, header } = require('express-validator');
 
 const validateCreateBooking = [
-  body('turfId')
-    .notEmpty().withMessage('Turf ID is required')
-    .isMongoId().withMessage('Invalid turf ID format'),
+  header('Idempotency-Key').optional().trim().isLength({ min: 8, max: 128 }).withMessage('Idempotency-Key must be 8 to 128 characters'),
+  body('turfId').optional().isMongoId().withMessage('Invalid turf ID format'),
+  body('facilityId').optional().isMongoId().withMessage('Invalid facility ID format'),
+  body().custom((value) => Boolean(value?.turfId) !== Boolean(value?.facilityId))
+    .withMessage('Provide exactly one of turfId or facilityId'),
   body('date')
     .notEmpty().withMessage('Date is required')
-    .isISO8601().withMessage('Date must be a valid ISO date string'),
+    .isDate({ format: 'YYYY-MM-DD', strictMode: true }).withMessage('Date must use YYYY-MM-DD format'),
   body('timeSlot')
     .trim()
     .notEmpty().withMessage('Time slot is required')
-    .isLength({ min: 5, max: 50 }).withMessage('Time slot must be between 5 and 50 characters'),
+    .matches(/^([01]?\d|2[0-3]):[0-5]\d\s*-\s*([01]?\d|2[0-3]):[0-5]\d$/).withMessage('Time slot must use HH:MM-HH:MM format')
+    .custom((value) => {
+      const [start, end] = value.split('-').map((time) => time.trim().split(':').reduce((h, m) => Number(h) * 60 + Number(m)));
+      return end > start && start % 15 === 0 && end % 15 === 0;
+    }).withMessage('Time slot end must be after start'),
   body('paymentMethod')
     .optional()
     .trim()
@@ -31,10 +37,8 @@ const validateUpdateBookingStatus = [
     .optional()
     .trim()
     .isIn(['pending', 'confirmed', 'cancelled', 'completed']).withMessage('Invalid booking status'),
-  body('paymentStatus')
-    .optional()
-    .trim()
-    .isIn(['pending', 'paid', 'failed']).withMessage('Invalid payment status')
+  body().custom((value) => ['bookingStatus'].some((key) => value?.[key] !== undefined))
+    .withMessage('Booking status is required')
 ];
 
 module.exports = {

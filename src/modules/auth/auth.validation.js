@@ -37,7 +37,8 @@ const validateUpdateProfile = [
     .optional()
     .trim()
     .isEmail().withMessage('Please provide a valid email address')
-    .normalizeEmail()
+    .normalizeEmail(),
+  body().custom((value) => Object.keys(value || {}).length > 0).withMessage('At least one profile field is required')
 ];
 
 const validateChangePassword = [

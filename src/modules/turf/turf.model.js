@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const turfSchema = new mongoose.Schema({
   ownerDetails: {
     adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth' },
+    businessUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth', index: true },
     name: { type: String, required: true },
     contactNumber: { type: String, required: true },
     email: { type: String, required: true }
@@ -27,6 +28,7 @@ const turfSchema = new mongoose.Schema({
     zipCode: { type: String, required: true },
     googleMapLink: String
   },
+  timezone: { type: String, default: 'Asia/Kolkata' },
   pricing: {
     weekdayRate: { type: Number, required: true },
     weekendRate: { type: Number, required: true },

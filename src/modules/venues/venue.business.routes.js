@@ -1,0 +1,25 @@
+const express = require('express');
+const router = express.Router();
+const controller = require('./venue.controller');
+const facilityController = require('./facility.controller');
+const { validate } = require('../../middleware/validate');
+const { protect, isBusinessUser } = require('../../middleware/adminMiddleware');
+const { validateCreate, validateUpdate, venueId } = require('./venue.validation');
+const { ids, validateFacility, validateAvailabilityRule, validatePricingRule, validateRuleId } = require('./facility.validation');
+const { auditResponse } = require('../../middleware/audit-response.middleware');
+
+router.use(protect, isBusinessUser);
+router.get('/', controller.listMine);
+router.post('/', validateCreate, validate, auditResponse('VENUE_CREATED', 'Venue'), controller.create);
+router.put('/:id', validateUpdate, validate, auditResponse('VENUE_UPDATED', 'Venue'), controller.update);
+router.get('/:venueId/facilities', ids.slice(0, 1), validate, facilityController.list);
+router.post('/:venueId/facilities', ids.slice(0, 1), validateFacility, validate, auditResponse('FACILITY_CREATED', 'Facility', (req) => req.params.venueId), facilityController.create);
+router.put('/:venueId/facilities/:facilityId', ids, validateFacility, validate, auditResponse('FACILITY_UPDATED', 'Facility', (req) => req.params.facilityId), facilityController.update);
+router.get('/:venueId/facilities/:facilityId/availability-rules', ids, validate, facilityController.listAvailabilityRules);
+router.put('/:venueId/facilities/:facilityId/availability-rules', validateAvailabilityRule, validate, facilityController.upsertAvailabilityRule);
+router.delete('/:venueId/facilities/:facilityId/availability-rules/:ruleId', validateRuleId, validate, facilityController.deleteAvailabilityRule);
+router.get('/:venueId/facilities/:facilityId/pricing-rules', ids, validate, facilityController.listPricingRules);
+router.post('/:venueId/facilities/:facilityId/pricing-rules', validatePricingRule, validate, facilityController.createPricingRule);
+router.put('/:venueId/facilities/:facilityId/pricing-rules/:ruleId', validateRuleId, validatePricingRule, validate, auditResponse('FACILITY_PRICING_UPDATED', 'FacilityPricingRule', (req) => req.params.ruleId), facilityController.updatePricingRule);
+router.delete('/:venueId/facilities/:facilityId/pricing-rules/:ruleId', validateRuleId, validate, facilityController.deletePricingRule);
+module.exports = router;
