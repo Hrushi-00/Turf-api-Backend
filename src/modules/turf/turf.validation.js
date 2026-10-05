@@ -77,6 +77,11 @@ const validateAddTurf = [
     .trim()
     .notEmpty().withMessage('Zip code is required')
     .matches(/^[0-9]{5,10}$/).withMessage('Zip code must be 5-10 digits'),
+  body('location.coordinates').optional().custom((point) =>
+    point?.type === 'Point' && Array.isArray(point.coordinates) && point.coordinates.length === 2 &&
+    Number.isFinite(Number(point.coordinates[0])) && Number(point.coordinates[0]) >= -180 && Number(point.coordinates[0]) <= 180 &&
+    Number.isFinite(Number(point.coordinates[1])) && Number(point.coordinates[1]) >= -90 && Number(point.coordinates[1]) <= 90
+  ).withMessage('Coordinates must be a GeoJSON Point [longitude, latitude]'),
   body('pricing.weekdayRate')
     .notEmpty().withMessage('Weekday rate is required')
     .isFloat({ min: 0 }).withMessage('Weekday rate must be a non-negative number'),

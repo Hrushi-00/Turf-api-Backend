@@ -26,7 +26,17 @@ const turfSchema = new mongoose.Schema({
     city: { type: String, required: true },
     state: { type: String, required: true },
     zipCode: { type: String, required: true },
-    googleMapLink: String
+    googleMapLink: String,
+    coordinates: {
+      type: { type: String, enum: ['Point'] },
+      coordinates: {
+        type: [Number],
+        validate: {
+          validator: (value) => !value || value.length === 2,
+          message: 'Coordinates must contain longitude and latitude'
+        }
+      }
+    }
   },
   timezone: { type: String, default: 'Asia/Kolkata' },
   pricing: {
@@ -63,5 +73,7 @@ const turfSchema = new mongoose.Schema({
   },
   status: { type: String, enum: ['pending', 'rejected', 'active'], default: 'pending' }
 });
+
+turfSchema.index({ 'location.coordinates': '2dsphere' });
 
 module.exports = mongoose.model('Turf', turfSchema);

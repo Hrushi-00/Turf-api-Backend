@@ -24,6 +24,15 @@ const getAllTurfs = async (req, res) => {
   }
 };
 
+const getNearbyTurfs = async (req, res) => {
+  try {
+    const result = await turfService.getNearbyTurfs(req.query);
+    res.status(200).json(result);
+  } catch (error) {
+    sendError(res, error);
+  }
+};
+
 const getAdminTurfs = async (req, res) => {
   try {
     const result = await turfService.getAdminTurfs(req.user);
@@ -145,6 +154,7 @@ const getTurfAvailability = async (req, res) => {
 module.exports = {
   addTurf,
   getAllTurfs,
+  getNearbyTurfs,
   getAdminTurfs,
   getTurf,
   updateTurf,

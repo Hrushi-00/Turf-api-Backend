@@ -174,6 +174,36 @@ const getAllTurfs = async (filters) => {
   };
 };
 
+const getNearbyTurfs = async ({ latitude, longitude, radiusKm = 10, page = 1, limit = 20 }) => {
+  const pageNumber = Math.max(parseInt(page, 10) || 1, 1);
+  const pageSize = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 100);
+  const maxDistanceMeters = Number(radiusKm) * 1000;
+  const ownerFilter = await publicOwnerFilter();
+  const geoNear = {
+    $geoNear: {
+      near: { type: 'Point', coordinates: [Number(longitude), Number(latitude)] },
+      key: 'location.coordinates',
+      distanceField: 'distanceMeters',
+      maxDistance: maxDistanceMeters,
+      spherical: true,
+      query: { $and: [{ status: 'active', 'metaInfo.isApproved': true }, ownerFilter] }
+    }
+  };
+
+  const [data, countResult] = await Promise.all([
+    Turf.aggregate([
+      geoNear,
+      { $addFields: { distanceKm: { $divide: ['$distanceMeters', 1000] } } },
+      { $unset: 'distanceMeters' },
+      { $skip: (pageNumber - 1) * pageSize },
+      { $limit: pageSize }
+    ]),
+    Turf.aggregate([geoNear, { $count: 'total' }])
+  ]);
+  const total = countResult[0]?.total || 0;
+  return { success: true, total, page: pageNumber, pages: Math.ceil(total / pageSize), radiusKm: Number(radiusKm), data };
+};
+
 const getAdminTurfs = async (user) => {
   let query = {};
   if (user.role !== 'Admin' && user.role !== 'SuperAdmin') {
@@ -457,6 +487,7 @@ const getTurfAvailability = async (params, user) => {
 module.exports = {
   addTurf,
   getAllTurfs,
+  getNearbyTurfs,
   getAdminTurfs,
   getTurf,
   updateTurf,
