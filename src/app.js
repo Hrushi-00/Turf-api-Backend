@@ -16,13 +16,10 @@ app.use((req, res, next) => {
   next();
 });
 
-const allowedOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',').map((origin) => origin.trim()).filter(Boolean);
 app.use(cors({
-  origin(origin, callback) {
-    if (!origin || (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'production') || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Origin is not allowed by CORS'));
-  }
+  // Reflect the requesting origin so browser clients from any domain can call the API.
+  // Credentials remain disabled; clients must continue sending auth tokens explicitly.
+  origin: true
 }));
 app.use(express.json({
   limit: process.env.JSON_BODY_LIMIT || '1mb',
